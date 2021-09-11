@@ -1,0 +1,3 @@
+[submodule "ZeronameElectrumNMC"]
+	path = ZeronameElectrumNMC
+	url = git@github.com:rllola/zeronet-electrum-nmc-plugin.git
