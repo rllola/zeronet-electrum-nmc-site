@@ -1,0 +1,16 @@
+{
+ "address": "",
+ "background-color": "#FFF",
+ "description": "Electrum NMC plugin site.",
+ "ignore": "(.git|content.json-copy|README.md|ZeronameElectrumNMC/README.md)",
+ "inner_path": "content.json",
+ "modified": 1631364799,
+ "optional": "ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip",
+ "postmessage_nonce_security": true,
+ "signers_sign": "",
+ "signs": {},
+ "signs_required": 1,
+ "title": "Electrum NMC plugin",
+ "translate": ["js/all.js"],
+ "zeronet_version": "0.7.2"
+}
