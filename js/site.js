@@ -38,6 +38,10 @@ class Site extends ZeroFrame {
         return this.cmdp('fileNeed', 'ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip')
     }
 
+    hasElectrumZip () {
+        return this.cmdp('optionalFileInfo', 'ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip')
+    }
+
     addPluginRequest () {
         return this.cmdp('pluginAddRequest', `ZeronameElectrumNMC`)
     }
@@ -63,13 +67,18 @@ class Site extends ZeroFrame {
 const site = new Site()
 
 async function install () {
+    let kek = await site.hasElectrumZip()
+    console.log(kek)
     let result = await site.needElectrumZip()
-    if (result == "ok") {
+    console.log(result)
+    let kek = await site.hasElectrumZip()
+    console.log(kek)
+    /*if (result == "ok") {
         result = await site.addPluginRequest()
         if (result == "ok") {
             console.log('Plugin succefully installed')
         }
-    }
+    }*/
 }
 
 site.fetchServerInfo()
