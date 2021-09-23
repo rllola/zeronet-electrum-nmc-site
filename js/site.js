@@ -42,10 +42,6 @@ class Site extends ZeroFrame {
         return this.cmdp('optionalFileInfo', 'ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip')
     }
 
-    getElectrumZip () {
-        return this.cmdp('fileGet', { inner_path: 'ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip', format: 'base64'})
-    }
-
     addPluginRequest () {
         return this.cmdp('pluginAddRequest', `ZeronameElectrumNMC`)
     }
@@ -55,6 +51,10 @@ class Site extends ZeroFrame {
             return true
         }
         return false
+    }
+
+    autoDownload () {
+        return this.cmdp('optionalHelp', ['ZeronameElectrumNMC', 'Electrum NMC files'])
     }
 
     setSiteInfo (info) {
@@ -71,30 +71,29 @@ class Site extends ZeroFrame {
 const site = new Site()
 
 async function install () {
-    let result
-    result = await site.hasElectrumZip()
-    console.log(result)
-    result = await site.needElectrumZip()
-    console.log(result)
-    result = await site.getElectrumZip()
-    console.log(result)
-    result = await site.hasElectrumZip()
-    console.log(result)
-    /*if (result == "ok") {
+    let result = await site.hasElectrumZip()
+    if (result.is_downloaded) {
         result = await site.addPluginRequest()
         if (result == "ok") {
-            console.log('Plugin succefully installed')
+            site.log('Plugin succefully installed')
         }
-    }*/
+    } else {
+        site.log('Optional files are required for install to be successfull')
+    }
 }
 
 site.fetchServerInfo()
-    .then(function () {
+    .then(async function () {
         const element = document.getElementById("root")
         if (site.hasElectrumMNCPlugin()) {
             // Plugin installed; show version;
             element.innerHTML = "<p>The plugin is installed.</p>"
         } else {
+            // Auto Download optional file
+            let result = await site.hasElectrumZip()
+            if (result.is_downloaded == 0 || result.is_pinned == 0) {
+                await site.autoDownload()
+            }
             // Plugin not installed; show install button;
             element.innerHTML = "<p>The plugin is not installed.</p>" +
             "<button onClick='install()'>Install plugin</button><br/>" +
