@@ -42,6 +42,10 @@ class Site extends ZeroFrame {
         return this.cmdp('optionalFileInfo', 'ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip')
     }
 
+    getElectrumZip () {
+        return this.cmdp('fileGet', { inner_path: 'ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip', format: 'base64'})
+    }
+
     addPluginRequest () {
         return this.cmdp('pluginAddRequest', `ZeronameElectrumNMC`)
     }
@@ -67,12 +71,15 @@ class Site extends ZeroFrame {
 const site = new Site()
 
 async function install () {
-    let kek = await site.hasElectrumZip()
-    console.log(kek)
-    let result = await site.needElectrumZip()
+    let result
+    result = await site.hasElectrumZip()
     console.log(result)
-    let kek = await site.hasElectrumZip()
-    console.log(kek)
+    result = await site.needElectrumZip()
+    console.log(result)
+    result = await site.getElectrumZip()
+    console.log(result)
+    result = await site.hasElectrumZip()
+    console.log(result)
     /*if (result == "ok") {
         result = await site.addPluginRequest()
         if (result == "ok") {
@@ -89,7 +96,10 @@ site.fetchServerInfo()
             element.innerHTML = "<p>The plugin is installed.</p>"
         } else {
             // Plugin not installed; show install button;
-            element.innerHTML = "<p>The plugin is not installed.</p><button onClick='install()'>Install plugin</button>"
+            element.innerHTML = "<p>The plugin is not installed.</p>" +
+            "<button onClick='install()'>Install plugin</button><br/>" +
+            "<p>Make sure that `ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip` optional file is fully downloaded."+
+            " You can open the side panel and help distributing optional file."
         }
         element.style.display = "block"
     })
