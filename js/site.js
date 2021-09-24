@@ -1,9 +1,10 @@
 class Site extends ZeroFrame {
-    constructor () {
+    constructor (args) {
         super()
 
         this.siteInfo = {}
         this.serverInfo = {}
+        this.eventCallback = args.eventCallback
     }
 
     log (...args) {
@@ -14,6 +15,7 @@ class Site extends ZeroFrame {
         switch(cmd) {
         case 'setSiteInfo':
             this.setSiteInfo(message.params)
+            this.eventCallback(message.params.event)
             break
         default:
             console.log(`Unknown command: ${cmd}`)
@@ -68,7 +70,26 @@ class Site extends ZeroFrame {
     }
 }
 
-const site = new Site()
+const element = document.getElementById("root")
+
+
+async function siteEvent (event) {
+    switch (event[0]) {
+        case "file_done":
+            let result = await site.hasElectrumZip()
+            console.log(result)
+            if (result.is_downloaded && !site.hasElectrumMNCPlugin()) {
+                // Plugin not installed; show install button;
+                element.innerHTML = "<p>The plugin is not installed.</p>" +
+                "<button onClick='install()'>Install plugin</button><br/>"
+            }
+            break
+        default:
+            console.log(event)
+    }
+}
+
+const site = new Site({ eventCallback: siteEvent })
 
 async function install () {
     let result = await site.hasElectrumZip()
@@ -84,21 +105,23 @@ async function install () {
 
 site.fetchServerInfo()
     .then(async function () {
-        const element = document.getElementById("root")
         if (site.hasElectrumMNCPlugin()) {
             // Plugin installed; show version;
             element.innerHTML = "<p>The plugin is installed.</p>"
         } else {
             // Auto Download optional file
             let result = await site.hasElectrumZip()
-            if (result.is_downloaded == 0 || result.is_pinned == 0) {
+            console.log(result)
+            if (result.is_downloaded == 0) {
                 await site.autoDownload()
+                await site.needElectrumZip()
+                element.innerHTML = "<p>Before installing we need first to download the optional file (you can speed up things by helping distributing files from this site).</p>"
+            } else {
+                // Plugin not installed; show install button;
+                element.innerHTML = "<p>The plugin is not installed.</p>" +
+                "<button onClick='install()'>Install plugin</button><br/>"
             }
-            // Plugin not installed; show install button;
-            element.innerHTML = "<p>The plugin is not installed.</p>" +
-            "<button onClick='install()'>Install plugin</button><br/>" +
-            "<p>Make sure that `ZeronameElectrumNMC/Electrum-NMC-3.3.10.zip` optional file is fully downloaded."+
-            " You can open the side panel and help distributing optional file."
+
         }
         element.style.display = "block"
     })
